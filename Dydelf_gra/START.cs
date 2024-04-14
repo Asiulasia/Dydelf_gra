@@ -4,62 +4,178 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.DataFormats;
 
 namespace Dydelf_gra
 {
     public partial class START : Form
     {
         Form1 parent;
-        private int rows = 3; // Domyślna liczba wierszy
-        private int columns = 3; // Domyślna liczba kolumn
+        private int czasOdmierzania;
         public START(Form1 okno)
         {
             InitializeComponent();
             parent = okno;
+            czasOdmierzania = parent.czas;
+            timer.Interval = 1000;
+            timer.Tick += timer1_Tick;
+
+            timer.Start();
+
         }
+        private List<PictureBox> in_game = new List<PictureBox>();
+        private List<PictureBox> nothing = new List<PictureBox>();
+        private List<PictureBox> dydelfs = new List<PictureBox>();
+        private List<PictureBox> crocodiles = new List<PictureBox>();
+
+        private int znalezione_dydelfy;
+        private bool koniec_gry;
+        private System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+        
+
 
         int x = 0;
-        int y = 0;
-        private void GameBoard()
+        int y = 100;
+        private PictureBox[,] pictureBoxes; // Tablica przechowująca PictureBox
+        List<Tuple<int, int>> listaDydelfow = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> listaKrokodylow = new List<Tuple<int, int>>();
+        public void GameBoard()
         {
-            for (int i = 0; i < rows; i++)
+            pictureBoxes = new PictureBox[parent.y, parent.x]; // Inicjalizacja tablicy PictureBox
+            for (int i = 0; i < parent.y; i++)
             {
-                for (int j = 0; j < columns; j++)
+                for (int j = 0; j < parent.x; j++)
                 {
                     PictureBox pictureBox = new PictureBox();
-                    //pictureBox.Dock = DockStyle.Fill;
-                    //pictureBox.BorderStyle = BorderStyle.FixedSingle;
-                    //pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-                    //pictureBox.BackColor = Color.White; // Domyślne tło
-
-                    //// Dodaj obsługę zdarzenia kliknięcia w PictureBox
-                    //pictureBox.Click += PictureBox_Click;
                     pictureBox.Location = new Point(x, y); // x i y to współrzędne punktu, gdzie ma być umieszczony PictureBox
-                    x = x + 20;
+                    x = x + 170;
                     // Ustaw rozmiar
-                    pictureBox.Size = new Size(20, 20);
+                    pictureBox.Size = new Size(170, 170);
                     pictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\krzak.jpg");
                     pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
                     Controls.Add(pictureBox);
+                    // Dodaj PictureBox do tablicy
+                    pictureBoxes[i, j] = pictureBox;
+                    // Dodaj obsługę zdarzenia kliknięcia w PictureBox
+                    pictureBox.Click += PictureBox_Click;
                 }
-                y = y + 20;
+                y = y + 170;
                 x = 0;
             }
+
+            int totalFields = parent.y * parent.x;
+
+            // Pętla wykonująca się tyle razy, ile wynosi parent.dydelfy
+            for (int i = 0; i < parent.dydelfy; i++)
+            {
+                Random random = new Random();
+                int randomRow = random.Next(1, parent.y);
+                int randomColumn = random.Next(1, parent.x);
+
+                // Dodajemy parę (indeks wiersza, indeks kolumny) do listy
+                listaDydelfow.Add(new Tuple<int, int>(randomRow, randomColumn));
+                //MessageBox.Show($"Clicked PictureBox at row {randomRow}, column {randomColumn}");
+            }
+
+
+            for (int i = 0; i < parent.krokodyle; i++)
+            {
+                Tuple<int, int> krokodylTuple;
+                do
+                {
+                    Random random = new Random();
+                    int randomRow = random.Next(1, parent.y);
+                    int randomColumn = random.Next(1, parent.x);
+                    krokodylTuple = new Tuple<int, int>(randomRow, randomColumn);
+                } while (listaDydelfow.Contains(krokodylTuple));
+
+                // Dodajemy parę (indeks wiersza, indeks kolumny) do listy
+                listaKrokodylow.Add(krokodylTuple);
+            }
+
+
         }
+
         private void PictureBox_Click(object sender, EventArgs e)
         {
-            PictureBox pictureBox = sender as PictureBox;
-            // Obsługa kliknięcia w PictureBox
-            MessageBox.Show("Kliknięto na PictureBox!");
+            // Znajdź indeks klikniętego PictureBox w tablicy pictureBoxes
+            PictureBox clickedPictureBox = (PictureBox)sender;
+            int clickedRowIndex = -1;
+            int clickedColumnIndex = -1;
+            bool isClickedDydelf = false;
+            bool isClickedKrokodyl = false;
+            // Przeszukaj tablicę pictureBoxes, aby znaleźć indeks klikniętego PictureBox
+            for (int i = 0; i < parent.y; i++)
+            {
+                for (int j = 0; j < parent.x; j++)
+                {
+                    if (pictureBoxes[i, j] == clickedPictureBox)
+                    {
+                        clickedRowIndex = i;
+                        clickedColumnIndex = j;
+                        var clickedBox = Tuple.Create(j, i);
+                        isClickedDydelf = listaDydelfow.Contains(clickedBox);
+                        isClickedKrokodyl = listaKrokodylow.Contains(clickedBox);
+                        break;
+                    }
+                }
+                if (clickedRowIndex != -1)
+                    break;
+            }
+
+            if (isClickedDydelf)
+            {
+                clickedPictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\studia\\VS_2022\\Programowanie_wizualne_Szawulak\\projekt_lab6_dydelf\\dydelf.jpg");
+                clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                znalezione_dydelfy++;
+                if (znalezione_dydelfy == parent.dydelfy && !koniec_gry)
+                {
+                    koniec_gry = true;
+                    label1.Text = "WYGRAŁEŚ!!!";
+                    timer.Stop();
+                }
+            }
+            else if (isClickedKrokodyl)
+            {
+                clickedPictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\studia\\VS_2022\\Programowanie_wizualne_Szawulak\\projekt_lab6_dydelf\\krokodyl.jpg");
+                clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                if (!koniec_gry)
+                {
+                    koniec_gry = true;
+                    label1.Text = "PRZEGRAŁEŚ :(";
+                    timer.Stop();
+                }
+            }
+            else
+            {
+                clickedPictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\studia\\VS_2022\\Programowanie_wizualne_Szawulak\\projekt_lab6_dydelf\\nic.jpg");
+                clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
         }
 
-
-        private void button1_Click(object sender, EventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)
         {
-            GameBoard();
+            czasOdmierzania--;
+
+            label2.Text = czasOdmierzania.ToString() + " s";
+
+            if (czasOdmierzania <= 0)
+            {
+                timer.Stop();
+
+                label1.Text = "PRZEGRAŁEŚ :( czas się skończył";
+                koniec_gry = true;
+            }
         }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }
