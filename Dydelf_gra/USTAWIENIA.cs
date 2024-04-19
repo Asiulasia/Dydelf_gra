@@ -47,18 +47,30 @@ namespace Dydelf_gra
 
         private void button1_Click(object sender, EventArgs e)
         {
-            X.Text = "3";
-            Y.Text = "3";
-            dydelfy.Text = "1";
-            krokodyle.Text = "1";
-            czas.Text = "30";
-            if (Int32.Parse(X.Text) <= 10 && Int32.Parse(Y.Text) <= 10 && Int32.Parse(dydelfy.Text) + Int32.Parse(krokodyle.Text) <= Int32.Parse(X.Text) * Int32.Parse(Y.Text) && Int32.Parse(czas.Text) > 0)
+            // Domyślne wartości dla pól
+            int domyslneX = 3;
+            int domyslneY = 3;
+            int domyslneDydelfy = 1;
+            int domyslneKrokodyle = 1;
+            int domyslnyCzas = 30;
+
+            // Sprawdź, czy użytkownik wprowadził dane; jeśli nie, użyj domyślnych wartości
+            int wprowadzoneX = string.IsNullOrWhiteSpace(X.Text) ? domyslneX : int.Parse(X.Text);
+            int wprowadzoneY = string.IsNullOrWhiteSpace(Y.Text) ? domyslneY : int.Parse(Y.Text);
+            int wprowadzoneDydelfy = string.IsNullOrWhiteSpace(dydelfy.Text) ? domyslneDydelfy : int.Parse(dydelfy.Text);
+            int wprowadzoneKrokodyle = string.IsNullOrWhiteSpace(krokodyle.Text) ? domyslneKrokodyle : int.Parse(krokodyle.Text);
+            int wprowadzonyCzas = string.IsNullOrWhiteSpace(czas.Text) ? domyslnyCzas : int.Parse(czas.Text);
+
+            // Sprawdź poprawność wprowadzonych danych
+            if (wprowadzoneX <= 10 && wprowadzoneY <= 10 && wprowadzoneDydelfy + wprowadzoneKrokodyle <= wprowadzoneX * wprowadzoneY && wprowadzonyCzas > 0)
             {
-                parent.x = Int32.Parse(X.Text);
-                parent.y = Int32.Parse(Y.Text);
-                parent.dydelfy = Int32.Parse(dydelfy.Text);
-                parent.krokodyle = Int32.Parse(krokodyle.Text);
-                parent.czas = Int32.Parse(czas.Text);
+                // Przypisz wartości do pól formularza nadrzędnego
+                parent.x = wprowadzoneX;
+                parent.y = wprowadzoneY;
+                parent.dydelfy = wprowadzoneDydelfy;
+                parent.krokodyle = wprowadzoneKrokodyle;
+                parent.czas = wprowadzonyCzas;
+
                 Close();
             }
             else

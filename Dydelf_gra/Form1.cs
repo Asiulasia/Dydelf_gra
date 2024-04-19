@@ -19,10 +19,12 @@ namespace Dydelf_gra
             nowe_okno.GameBoard(); 
         }
 
+
         private void ustawienia_Click(object sender, EventArgs e)
         {
             USTAWIENIA nowe_okno = new USTAWIENIA(this);
             nowe_okno.ShowDialog();
+
         }
 
         private void koniec_Click(object sender, EventArgs e)

@@ -27,16 +27,10 @@ namespace Dydelf_gra
             timer.Start();
 
         }
-        private List<PictureBox> in_game = new List<PictureBox>();
-        private List<PictureBox> nothing = new List<PictureBox>();
-        private List<PictureBox> dydelfs = new List<PictureBox>();
-        private List<PictureBox> crocodiles = new List<PictureBox>();
 
         private int znalezione_dydelfy;
         private bool koniec_gry;
         private System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-        
-
 
         int x = 0;
         int y = 100;
@@ -55,7 +49,7 @@ namespace Dydelf_gra
                     x = x + 170;
                     // Ustaw rozmiar
                     pictureBox.Size = new Size(170, 170);
-                    pictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\krzak.jpg");
+                    pictureBox.Image = Resource1.krzak;
                     pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
                     Controls.Add(pictureBox);
                     // Dodaj PictureBox do tablicy
@@ -129,7 +123,7 @@ namespace Dydelf_gra
 
             if (isClickedDydelf)
             {
-                clickedPictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\studia\\VS_2022\\Programowanie_wizualne_Szawulak\\projekt_lab6_dydelf\\dydelf.jpg");
+                clickedPictureBox.Image = Resource1.dydelf;
                 clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
                 znalezione_dydelfy++;
                 if (znalezione_dydelfy == parent.dydelfy && !koniec_gry)
@@ -141,7 +135,7 @@ namespace Dydelf_gra
             }
             else if (isClickedKrokodyl)
             {
-                clickedPictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\studia\\VS_2022\\Programowanie_wizualne_Szawulak\\projekt_lab6_dydelf\\krokodyl.jpg");
+                clickedPictureBox.Image = Resource1.krokodyl;
                 clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
                 if (!koniec_gry)
                 {
@@ -152,7 +146,7 @@ namespace Dydelf_gra
             }
             else
             {
-                clickedPictureBox.Image = Image.FromFile("C:\\Users\\Tomasz\\Desktop\\studia\\VS_2022\\Programowanie_wizualne_Szawulak\\projekt_lab6_dydelf\\nic.jpg");
+                clickedPictureBox.Image = Resource1.nic;
                 clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
             }
         }
